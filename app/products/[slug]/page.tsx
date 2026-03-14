@@ -67,7 +67,7 @@ export default function ProductDetailPage() {
   const { data: productData, isLoading, error: queryError, refetch } = useQuery({
     queryKey: queryKeys.products.detail(slug),
     queryFn: async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://tapix-backend.onrender.com/api/v1';
 
       // Try slug endpoint first
       try {
