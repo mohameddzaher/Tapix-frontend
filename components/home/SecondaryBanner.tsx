@@ -7,8 +7,10 @@ import { motion } from 'framer-motion';
 import { HiArrowRight } from 'react-icons/hi';
 import { bannersApi } from '@/lib/api';
 import { queryKeys } from '@/lib/query-client';
+import { useTranslation } from '@/lib/i18n';
 
 export function SecondaryBanner() {
+  const { t } = useTranslation();
   const { data: banners, isLoading } = useQuery({
     queryKey: queryKeys.banners.byPosition('hero_secondary'),
     queryFn: () => bannersApi.getByPosition('hero_secondary'),
@@ -61,15 +63,13 @@ export function SecondaryBanner() {
                         {banner.title}
                       </h3>
                     )}
-                    {banner.linkText && (
-                      <span className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-white/90 group-hover:text-white transition-colors">
-                        {banner.linkText}
-                        <HiArrowRight
-                          size={14}
-                          className="transition-transform group-hover:translate-x-1"
-                        />
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-lg text-sm font-medium text-white transition-colors">
+                      {banner.linkText || t('hero.shopNow')}
+                      <HiArrowRight
+                        size={14}
+                        className="transition-transform group-hover:translate-x-1"
+                      />
+                    </span>
                   </div>
                 </div>
               </Link>
