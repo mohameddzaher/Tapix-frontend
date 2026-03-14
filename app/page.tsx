@@ -11,6 +11,8 @@ import {
   Testimonials,
   Newsletter,
   SecondaryBanner,
+  MiddleBanner,
+  BottomBanner,
   CategoryStrip,
 } from "@/components/home";
 import { useSettings } from "@/lib/settings-context";
@@ -21,10 +23,12 @@ const sectionMap: Record<string, ComponentType> = {
   features: Features,
   categoryStrip: CategoryStrip,
   deals: DealsSection,
+  middleBanner: MiddleBanner,
   featured: FeaturedProducts,
   brands: Brands,
   whyChooseUs: WhyChooseUs,
   testimonials: Testimonials,
+  bottomBanner: BottomBanner,
   newsletter: Newsletter,
 };
 
@@ -34,11 +38,13 @@ const defaultSections = [
   { key: "features", enabled: true, order: 1 },
   { key: "deals", enabled: true, order: 2 },
   { key: "categoryStrip", enabled: true, order: 3 },
-  { key: "featured", enabled: true, order: 4 },
-  { key: "brands", enabled: true, order: 5 },
-  { key: "whyChooseUs", enabled: true, order: 6 },
-  { key: "testimonials", enabled: true, order: 7 },
-  { key: "newsletter", enabled: true, order: 8 },
+  { key: "middleBanner", enabled: true, order: 4 },
+  { key: "featured", enabled: true, order: 5 },
+  { key: "brands", enabled: true, order: 6 },
+  { key: "whyChooseUs", enabled: true, order: 7 },
+  { key: "testimonials", enabled: true, order: 8 },
+  { key: "bottomBanner", enabled: true, order: 9 },
+  { key: "newsletter", enabled: true, order: 10 },
 ];
 
 export default function HomePage() {

@@ -9,4 +9,6 @@ export { Testimonials } from './Testimonials';
 export { Brands } from './Brands';
 export { WhyChooseUs } from './WhyChooseUs';
 export { SecondaryBanner } from './SecondaryBanner';
+export { MiddleBanner } from './MiddleBanner';
+export { BottomBanner } from './BottomBanner';
 export { CategoryStrip } from './CategoryStrip';
