@@ -165,20 +165,6 @@ export default function LoginPage() {
           </p>
         </Card>
 
-        {/* Demo credentials */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-6 p-4 bg-beige-100 rounded-xl text-center"
-        >
-          <p className="text-xs text-dark-500 font-medium mb-2">{t('auth.demoAccounts')}</p>
-          <div className="space-y-1 text-xs text-dark-600">
-            <p>Super Admin: admin@tapix.com / admin123</p>
-            <p>Staff: staff@tapix.com / staff123</p>
-            <p>User: user@tapix.com / user123</p>
-          </div>
-        </motion.div>
       </motion.div>
     </div>
   );
