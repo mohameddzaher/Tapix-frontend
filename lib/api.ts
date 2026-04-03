@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@tapix/shared';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tapix-backend.onrender.com/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api/v1';
 
 // Token management
 let accessToken: string | null = null;
@@ -877,6 +877,70 @@ export const adminApi = {
 
   adjustUserPoints: (userId: string, data: { freeze?: boolean; adjustPoints?: number; reason?: string }) =>
     apiPatch<any>(`/loyalty/admin/${userId}`, data),
+};
+
+// ========== B2B APIs ==========
+export const b2bApi = {
+  // Dashboard
+  getDashboard: (params?: { period?: number }) =>
+    apiGet<any>('/admin/b2b/dashboard', params),
+
+  // Products
+  getProducts: async (params?: any) => {
+    const result = await apiGetPaginated<any[]>('/admin/b2b/products', params);
+    return { products: result.data, pagination: result.pagination };
+  },
+  getProduct: (id: string) => apiGet<any>(`/admin/b2b/products/${id}`),
+  createProduct: (data: any) => apiPost<any>('/admin/b2b/products', data),
+  updateProduct: (id: string, data: any) => apiPatch<any>(`/admin/b2b/products/${id}`, data),
+  deleteProduct: (id: string) => apiDelete<any>(`/admin/b2b/products/${id}`),
+
+  // Suppliers
+  getSuppliers: async (params?: any) => {
+    const result = await apiGetPaginated<any[]>('/admin/b2b/suppliers', params);
+    return { suppliers: result.data, pagination: result.pagination };
+  },
+  getAllSuppliers: () => apiGet<any[]>('/admin/b2b/suppliers/all'),
+  getSupplier: (id: string) => apiGet<any>(`/admin/b2b/suppliers/${id}`),
+  createSupplier: (data: any) => apiPost<any>('/admin/b2b/suppliers', data),
+  updateSupplier: (id: string, data: any) => apiPatch<any>(`/admin/b2b/suppliers/${id}`, data),
+  deleteSupplier: (id: string) => apiDelete<any>(`/admin/b2b/suppliers/${id}`),
+
+  // Clients
+  getClients: async (params?: any) => {
+    const result = await apiGetPaginated<any[]>('/admin/b2b/clients', params);
+    return { clients: result.data, pagination: result.pagination };
+  },
+  getAllClients: () => apiGet<any[]>('/admin/b2b/clients/all'),
+  getClient: (id: string) => apiGet<any>(`/admin/b2b/clients/${id}`),
+  createClient: (data: any) => apiPost<any>('/admin/b2b/clients', data),
+  updateClient: (id: string, data: any) => apiPatch<any>(`/admin/b2b/clients/${id}`, data),
+  deleteClient: (id: string) => apiDelete<any>(`/admin/b2b/clients/${id}`),
+
+  // Sales
+  getSales: async (params?: any) => {
+    const result = await apiGetPaginated<any[]>('/admin/b2b/sales', params);
+    return { sales: result.data, pagination: result.pagination };
+  },
+  getSale: (id: string) => apiGet<any>(`/admin/b2b/sales/${id}`),
+  createSale: (data: any) => apiPost<any>('/admin/b2b/sales', data),
+  updateSale: (id: string, data: any) => apiPatch<any>(`/admin/b2b/sales/${id}`, data),
+  deleteSale: (id: string) => apiDelete<any>(`/admin/b2b/sales/${id}`),
+  getInvoice: (id: string) => apiGet<any>(`/admin/b2b/sales/${id}/invoice`),
+
+  // Expenses
+  getExpenses: async (params?: any) => {
+    const response = await api.get('/admin/b2b/expenses', { params });
+    return {
+      expenses: response.data.data,
+      totalAmount: response.data.totalAmount,
+      pagination: response.data.pagination,
+    };
+  },
+  getExpense: (id: string) => apiGet<any>(`/admin/b2b/expenses/${id}`),
+  createExpense: (data: any) => apiPost<any>('/admin/b2b/expenses', data),
+  updateExpense: (id: string, data: any) => apiPatch<any>(`/admin/b2b/expenses/${id}`, data),
+  deleteExpense: (id: string) => apiDelete<any>(`/admin/b2b/expenses/${id}`),
 };
 
 export default api;

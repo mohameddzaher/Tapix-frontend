@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,10 @@ import {
   HiOutlineCalculator,
   HiOutlineGlobe,
   HiOutlineTemplate,
+  HiOutlineTruck,
+  HiOutlineUserGroup,
+  HiOutlineShoppingCart,
+  HiOutlineCash,
 } from 'react-icons/hi';
 import { useAuthStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -36,6 +40,9 @@ import NotificationBell from '@/components/admin/NotificationBell';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HiOutlineHome },
+];
+
+const b2cNav = [
   { name: 'Orders', href: '/admin/orders', icon: HiOutlineClipboardList },
   { name: 'Products', href: '/admin/products', icon: HiOutlineShoppingBag },
   { name: 'Categories', href: '/admin/categories', icon: HiOutlineCollection },
@@ -44,6 +51,15 @@ const navigation = [
   { name: 'Brands', href: '/admin/brands', icon: HiOutlineLibrary },
   { name: 'Customers', href: '/admin/customers', icon: HiOutlineUsers },
   { name: 'Reviews', href: '/admin/reviews', icon: HiOutlineStar },
+];
+
+const b2bNav = [
+  { name: 'B2B Dashboard', href: '/admin/b2b', icon: HiOutlineChartBar },
+  { name: 'B2B Products', href: '/admin/b2b/products', icon: HiOutlineCube },
+  { name: 'Suppliers', href: '/admin/b2b/suppliers', icon: HiOutlineTruck },
+  { name: 'Clients', href: '/admin/b2b/clients', icon: HiOutlineUserGroup },
+  { name: 'Sales', href: '/admin/b2b/sales', icon: HiOutlineShoppingCart },
+  { name: 'Expenses', href: '/admin/b2b/expenses', icon: HiOutlineCash },
 ];
 
 const operationsNav = [
@@ -78,6 +94,17 @@ export default function AdminLayout({
   const { user, isAuthenticated, isLoading } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  // Scroll active nav item into view on route change
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const activeLink = nav.querySelector('[data-active="true"]');
+    if (activeLink) {
+      activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -102,17 +129,28 @@ export default function AdminLayout({
   const isSuperAdmin = user?.role === 'super_admin';
   const isStaff = user?.role === 'staff';
 
-  const NavLink = ({ item, collapsed = false }: { item: (typeof navigation)[0]; collapsed?: boolean }) => {
-    const isActive = item.href === '/admin'
-      ? pathname === '/admin'
+  // Determine if current page is in B2B section
+  const isB2BSection = pathname.startsWith('/admin/b2b');
+
+  const NavLink = ({ item, collapsed = false, section = 'default' }: { item: (typeof navigation)[0]; collapsed?: boolean; section?: 'default' | 'b2b' }) => {
+    // Exact match for dashboard-type pages that are prefixes of other routes
+    const exactMatchPages = ['/admin', '/admin/b2b'];
+    const isActive = exactMatchPages.includes(item.href)
+      ? pathname === item.href
       : pathname === item.href || pathname.startsWith(item.href + '/');
+
+    const activeStyles = section === 'b2b'
+      ? 'bg-emerald-500/20 text-emerald-300'
+      : 'bg-primary-500/20 text-primary-300';
+
     return (
       <Link
         href={item.href}
+        data-active={isActive || undefined}
         className={cn(
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
           isActive
-            ? 'bg-primary-600/15 text-primary-400'
+            ? activeStyles
             : 'text-dark-300 hover:bg-dark-800 hover:text-white',
           collapsed && 'justify-center px-2'
         )}
@@ -125,7 +163,7 @@ export default function AdminLayout({
     );
   };
 
-  const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (
+  const SidebarContent = ({ collapsed = false, navElRef }: { collapsed?: boolean; navElRef?: React.RefObject<HTMLElement | null> }) => (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className={cn(
@@ -140,10 +178,34 @@ export default function AdminLayout({
       </div>
 
       {/* Navigation */}
-      <nav className={cn("flex-1 overflow-y-auto scrollbar-dark p-4 space-y-1", collapsed && "p-2")}>
+      <nav ref={navElRef as any} className={cn("flex-1 overflow-y-auto scrollbar-dark p-4 space-y-1", collapsed && "p-2")}>
         <div className="space-y-1">
           {navigation.map((item) => (
             <NavLink key={item.name} item={item} collapsed={collapsed} />
+          ))}
+        </div>
+
+        {/* B2C Section */}
+        <div className="pt-4 mt-4 border-t border-dark-800">
+          {!collapsed && (
+            <p className="px-3 mb-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
+              B2C - Online Store
+            </p>
+          )}
+          {b2cNav.map((item) => (
+            <NavLink key={item.name} item={item} collapsed={collapsed} />
+          ))}
+        </div>
+
+        {/* B2B Section */}
+        <div className="pt-4 mt-4 border-t border-dark-800">
+          {!collapsed && (
+            <p className="px-3 mb-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+              B2B - Wholesale
+            </p>
+          )}
+          {b2bNav.map((item) => (
+            <NavLink key={item.name} item={item} collapsed={collapsed} section="b2b" />
           ))}
         </div>
 
@@ -267,7 +329,7 @@ export default function AdminLayout({
         transition={{ duration: 0.2 }}
         className="hidden lg:fixed lg:top-0 lg:left-0 lg:bottom-0 lg:bg-dark-950 lg:border-r lg:border-dark-800 lg:block lg:z-40"
       >
-        <SidebarContent collapsed={isCollapsed} />
+        <SidebarContent collapsed={isCollapsed} navElRef={navRef} />
 
         {/* Toggle button - inside sidebar at bottom */}
         <button

@@ -9,8 +9,9 @@ import { z } from 'zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiOutlineArrowLeft, HiOutlinePlus, HiOutlineX, HiOutlineTrash, HiOutlineChevronUp, HiOutlineChevronDown } from 'react-icons/hi';
 import { Button, Input, Textarea, Select, Card, Checkbox } from '@/components/ui';
-import { adminApi, categoriesApi, brandsApi } from '@/lib/api';
+import { adminApi, categoriesApi, brandsApi, b2bApi } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { HiOutlineCube, HiOutlineDocumentAdd } from 'react-icons/hi';
 
 const optionalNumber = z.preprocess(
   (val) => (val === null || val === undefined || val === '' || (typeof val === 'number' && isNaN(val))) ? undefined : val,
@@ -65,6 +66,8 @@ export default function NewProductPage() {
   const [newImage, setNewImage] = useState('');
   const [faqs, setFaqs] = useState<ProductFAQ[]>([]);
   const [specs, setSpecs] = useState<ProductSpec[]>([]);
+  const [sourceMode, setSourceMode] = useState<'scratch' | 'b2b' | null>(null);
+  const [selectedB2BProduct, setSelectedB2BProduct] = useState<string>('');
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -75,6 +78,34 @@ export default function NewProductPage() {
     queryKey: ['brands'],
     queryFn: () => brandsApi.getAll(true),
   });
+
+  const { data: b2bProductsData } = useQuery({
+    queryKey: ['b2b-products-all'],
+    queryFn: () => b2bApi.getProducts({ limit: 200 }),
+    enabled: sourceMode === 'b2b',
+  });
+
+  const handleB2BProductSelect = (productId: string) => {
+    setSelectedB2BProduct(productId);
+    const product = b2bProductsData?.products?.find((p: any) => p._id === productId);
+    if (product) {
+      setValue('title', product.name || '');
+      setValue('description', product.description || product.name || '');
+      if (product.sku) setValue('sku', product.sku);
+      if (product.onlinePrice) setValue('price', product.onlinePrice);
+      else if (product.offlinePrice) setValue('price', product.offlinePrice);
+      setValue('stockQuantity', product.quantity || 0);
+      if (product.specs) {
+        setSpecs([{
+          id: `spec_${Date.now()}`,
+          group: 'General',
+          name: 'Specifications',
+          value: product.specs,
+        }]);
+      }
+      toast.success('B2B product data loaded! Add images and complete remaining fields.');
+    }
+  };
 
   const {
     register,
@@ -199,7 +230,67 @@ export default function NewProductPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      {/* Source Selection */}
+      {sourceMode === null && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+          <button
+            type="button"
+            onClick={() => setSourceMode('scratch')}
+            className="p-6 bg-white rounded-xl border-2 border-beige-200 hover:border-primary-500 transition-colors text-left group"
+          >
+            <HiOutlineDocumentAdd size={32} className="text-primary-600 mb-3" />
+            <h3 className="text-lg font-semibold text-dark-900">Create from Scratch</h3>
+            <p className="text-sm text-dark-500 mt-1">Add a new product with all details manually</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSourceMode('b2b')}
+            className="p-6 bg-white rounded-xl border-2 border-beige-200 hover:border-emerald-500 transition-colors text-left group"
+          >
+            <HiOutlineCube size={32} className="text-emerald-600 mb-3" />
+            <h3 className="text-lg font-semibold text-dark-900">Import from B2B</h3>
+            <p className="text-sm text-dark-500 mt-1">Select a B2B product and auto-fill its data</p>
+          </button>
+        </div>
+      )}
+
+      {/* B2B Product Selector */}
+      {sourceMode === 'b2b' && (
+        <Card padding="lg" className="max-w-2xl">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-dark-900">Select B2B Product</h2>
+            <Button type="button" variant="ghost" size="sm" onClick={() => { setSourceMode(null); setSelectedB2BProduct(''); }}>
+              Change Source
+            </Button>
+          </div>
+          <select
+            value={selectedB2BProduct}
+            onChange={(e) => handleB2BProductSelect(e.target.value)}
+            className="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            aria-label="Select B2B Product"
+          >
+            <option value="">-- Select a B2B Product --</option>
+            {b2bProductsData?.products?.map((p: any) => (
+              <option key={p._id} value={p._id}>
+                {p.name} {p.sku ? `(${p.sku})` : ''} — Qty: {p.quantity} — Cost: SAR {p.costPerUnit}
+              </option>
+            ))}
+          </select>
+          {selectedB2BProduct && (
+            <p className="mt-2 text-sm text-emerald-600">Product data loaded. Complete the form below and add images.</p>
+          )}
+        </Card>
+      )}
+
+      {sourceMode === 'scratch' && !selectedB2BProduct && (
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={() => setSourceMode(null)}>
+            Change Source
+          </Button>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className={sourceMode === null ? 'hidden' : ''}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">

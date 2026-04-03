@@ -18,7 +18,7 @@ import {
   HiOutlineRefresh,
   HiOutlineCalendar,
 } from 'react-icons/hi';
-import { adminApi } from '@/lib/api';
+import { adminApi, b2bApi } from '@/lib/api';
 import { queryKeys } from '@/lib/query-client';
 import { useAuthStore } from '@/lib/store';
 import {
@@ -163,6 +163,12 @@ export default function AdminDashboardPage() {
   const { data: topCategories } = useQuery({
     queryKey: ['admin-top-categories'],
     queryFn: () => adminApi.getTopCategories({ limit: 5 }),
+    refetchInterval: REFETCH_INTERVAL,
+  });
+
+  const { data: b2bDashboard } = useQuery({
+    queryKey: ['b2b-dashboard-main', 30],
+    queryFn: () => b2bApi.getDashboard({ period: 30 }),
     refetchInterval: REFETCH_INTERVAL,
   });
 
@@ -597,16 +603,75 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {/* ===== B2B Overview ===== */}
+      {b2bDashboard && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+          <Card className="border-l-4 border-l-emerald-500">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-semibold text-dark-900">B2B Wholesale Overview</h2>
+                <p className="text-xs text-dark-400 mt-0.5">Last 30 days</p>
+              </div>
+              <Link href="/admin/b2b" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
+                Full B2B Dashboard <HiArrowRight size={12} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { label: 'B2B Revenue', value: formatCurrency(b2bDashboard.stats?.totalRevenue || 0), color: 'bg-emerald-50 text-emerald-700' },
+                { label: 'B2B Profit', value: formatCurrency(b2bDashboard.stats?.totalProfit || 0), color: 'bg-green-50 text-green-700' },
+                { label: 'Net Profit', value: formatCurrency(b2bDashboard.stats?.netProfit || 0), color: b2bDashboard.stats?.netProfit >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700' },
+                { label: 'B2B Expenses', value: formatCurrency(b2bDashboard.stats?.totalExpenses || 0), color: 'bg-red-50 text-red-700' },
+                { label: 'B2B Sales', value: String(b2bDashboard.stats?.totalSales || 0), color: 'bg-blue-50 text-blue-700' },
+                { label: 'Inventory Value', value: formatCurrency(b2bDashboard.stats?.inventoryValue || 0), color: 'bg-purple-50 text-purple-700' },
+              ].map((item) => (
+                <div key={item.label} className={cn('p-3 rounded-xl text-center', item.color)}>
+                  <p className="text-[10px] font-medium opacity-75 mb-1">{item.label}</p>
+                  <p className="text-sm font-bold">{item.value}</p>
+                </div>
+              ))}
+            </div>
+            {/* Combined Totals */}
+            {isSuperAdmin && (
+              <div className="mt-4 pt-4 border-t border-beige-200">
+                <p className="text-xs font-semibold text-dark-500 mb-2 uppercase tracking-wider">Combined Totals (B2C + B2B)</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-primary-50 to-emerald-50 text-center">
+                    <p className="text-[10px] font-medium text-dark-500 mb-1">Combined Revenue</p>
+                    <p className="text-lg font-bold text-dark-900">
+                      {formatCurrency((stats.totalRevenue || 0) + (b2bDashboard.stats?.totalRevenue || 0))}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 text-center">
+                    <p className="text-[10px] font-medium text-dark-500 mb-1">B2B Net Profit</p>
+                    <p className={cn('text-lg font-bold', (b2bDashboard.stats?.netProfit || 0) >= 0 ? 'text-green-700' : 'text-red-700')}>
+                      {formatCurrency(b2bDashboard.stats?.netProfit || 0)}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 text-center">
+                    <p className="text-[10px] font-medium text-dark-500 mb-1">Total Inventory</p>
+                    <p className="text-lg font-bold text-dark-900">
+                      {formatCurrency(b2bDashboard.stats?.inventoryValue || 0)}
+                    </p>
+                    <p className="text-[10px] text-dark-400">{b2bDashboard.stats?.inventoryItems || 0} items</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </Card>
+        </motion.div>
+      )}
+
       {/* ===== Quick Actions ===== */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
         <Card>
           <h2 className="font-semibold text-dark-900 mb-3">Quick Actions</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'Add Product', href: '/admin/products/new', icon: <HiOutlineTag size={18} /> },
               { label: 'Manage Orders', href: '/admin/orders', icon: <HiOutlineShoppingBag size={18} /> },
-              { label: 'Create Offer', href: '/admin/offers/new', icon: <HiOutlineCurrencyDollar size={18} /> },
-              { label: 'View Customers', href: '/admin/customers', icon: <HiOutlineUsers size={18} /> },
+              { label: 'New B2B Sale', href: '/admin/b2b/sales', icon: <HiOutlineShoppingCart size={18} /> },
+              { label: 'B2B Dashboard', href: '/admin/b2b', icon: <HiOutlineChartBar size={18} /> },
             ].map((action) => (
               <Link
                 key={action.label}
