@@ -1863,7 +1863,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(functio
           <span className="text-sm font-medium" style={{ color: sale.paymentStatus === 'paid' ? '#059669' : sale.paymentStatus === 'partial' ? '#d97706' : '#dc2626' }}>
             Payment Status: {sale.paymentStatus === 'paid' ? 'Paid' : sale.paymentStatus === 'partial' ? 'Partially Paid' : 'Unpaid'}
             {sale.paymentMethod && ` | Method: ${sale.paymentMethod}`}
-            {sale.amountPaid > 0 && sale.paymentStatus !== 'paid' && ` | Paid: ${formatSAR(sale.amountPaid)}`}
+            {(sale.amountPaid || 0) > 0 && sale.paymentStatus !== 'paid' && ` | Paid: ${formatSAR(sale.amountPaid || 0)}`}
             {sale.paymentStatus !== 'paid' && ` | Remaining: ${formatSAR(sale.total - (sale.amountPaid || 0))}`}
           </span>
         </div>
