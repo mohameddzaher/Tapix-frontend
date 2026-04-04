@@ -174,26 +174,27 @@ function ProductSearchSelect({ products, value, onChange }: {
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-beige-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
+        <div className="absolute z-50 top-full left-0 mt-1 bg-white border border-beige-300 rounded-lg shadow-xl overflow-hidden" style={{ minWidth: '400px', width: '100%' }}>
           {/* Search input */}
-          <div className="p-2 border-b border-beige-200">
+          <div className="p-2.5 border-b border-beige-200 bg-beige-50">
             <div className="relative">
-              <HiOutlineSearch size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-dark-400" />
+              <HiOutlineSearch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search by name or code..."
-                className="w-full pl-8 pr-3 py-1.5 border border-beige-200 rounded text-sm focus:ring-1 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                className="w-full pl-9 pr-3 py-2 border border-beige-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"
                 autoFocus
               />
             </div>
+            <p className="text-[10px] text-dark-400 mt-1.5 px-1">{filtered.length} product{filtered.length !== 1 ? 's' : ''} found</p>
           </div>
 
           {/* Options */}
-          <div className="overflow-y-auto max-h-48">
+          <div className="overflow-y-auto max-h-64">
             {filtered.length === 0 ? (
-              <div className="p-3 text-sm text-dark-400 text-center">No products found</div>
+              <div className="p-4 text-sm text-dark-400 text-center">No products found</div>
             ) : (
               filtered.map(p => (
                 <button
@@ -204,17 +205,24 @@ function ProductSearchSelect({ products, value, onChange }: {
                     setIsOpen(false);
                     setSearch('');
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-beige-50 transition-colors flex items-center justify-between ${
-                    p._id === value ? 'bg-primary-50 text-primary-700' : 'text-dark-900'
+                  className={`w-full text-left px-3 py-2.5 text-sm hover:bg-beige-50 transition-colors border-b border-beige-100 last:border-0 ${
+                    p._id === value ? 'bg-primary-50' : ''
                   }`}
                 >
-                  <div className="min-w-0">
-                    <span className="font-mono text-xs text-dark-400 mr-2">{p.sku || '-'}</span>
-                    <span className="truncate">{p.name}</span>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs bg-dark-100 text-dark-600 px-1.5 py-0.5 rounded flex-shrink-0">{p.sku || '-'}</span>
+                        <span className={`truncate ${p._id === value ? 'text-primary-700 font-medium' : 'text-dark-900'}`}>{p.name}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs text-dark-500">{formatSAR(p.offlinePrice || p.onlinePrice || 0)}</span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${p.quantity > 5 ? 'bg-emerald-100 text-emerald-700' : p.quantity > 0 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                        {p.quantity} qty
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs text-dark-400 flex-shrink-0 ml-2">
-                    {p.quantity} in stock
-                  </span>
                 </button>
               ))
             )}
@@ -397,7 +405,14 @@ export default function B2BSalesPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => exportToCSV(sales, b2bSaleColumns, 'b2b-sales')}
+            onClick={async () => {
+              toast.loading('Exporting...', { id: 'export' });
+              try {
+                const all = await b2bApi.getSales({ limit: 9999 });
+                exportToCSV(all.sales, b2bSaleColumns, 'b2b-sales');
+                toast.success('Exported!', { id: 'export' });
+              } catch { toast.error('Export failed', { id: 'export' }); }
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-dark-800 text-white rounded-lg hover:bg-dark-700 transition-colors text-sm"
           >
             <HiOutlineDownload size={16} />
@@ -1050,7 +1065,7 @@ function CreateSaleForm({ clients, onSuccess, onBack }: CreateSaleFormProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                   {/* Product Select with Search */}
-                  <div className="sm:col-span-4">
+                  <div className="sm:col-span-5">
                     <label className="block text-xs font-medium text-dark-500 mb-1">
                       Product
                     </label>
@@ -1062,7 +1077,7 @@ function CreateSaleForm({ clients, onSuccess, onBack }: CreateSaleFormProps) {
                   </div>
 
                   {/* Available Qty Info */}
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-1">
                     <label className="block text-xs font-medium text-dark-500 mb-1">
                       Available
                     </label>

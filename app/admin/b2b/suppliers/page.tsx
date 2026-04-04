@@ -299,7 +299,14 @@ export default function B2BSuppliersPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => exportToCSV(suppliers, b2bSupplierColumns, 'b2b-suppliers')}
+            onClick={async () => {
+              toast.loading('Exporting...', { id: 'export' });
+              try {
+                const all = await b2bApi.getSuppliers({ limit: 9999 });
+                exportToCSV(all.suppliers, b2bSupplierColumns, 'b2b-suppliers');
+                toast.success('Exported!', { id: 'export' });
+              } catch { toast.error('Export failed', { id: 'export' }); }
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-dark-800 text-white rounded-lg hover:bg-dark-700 transition-colors text-sm"
           >
             <HiOutlineDownload size={16} />
