@@ -50,13 +50,28 @@ const defaultSections = [
 export default function HomePage() {
   const { settings } = useSettings();
 
-  const sections =
+  let sections =
     settings.homepageSections?.length > 0
-      ? settings.homepageSections
-      : defaultSections;
+      ? [...settings.homepageSections]
+      : [...defaultSections];
+
+  // Ensure testimonials always exists in sections
+  if (!sections.find((s) => s.key === "testimonials")) {
+    // Find featured section order to place testimonials right after it
+    const featuredOrder = sections.find((s) => s.key === "featured")?.order ?? 5;
+    sections.push({ key: "testimonials", enabled: true, order: featuredOrder + 0.5 });
+  }
+
+  // Force testimonials right after featured
+  const featuredIdx = sections.findIndex((s) => s.key === "featured");
+  const testimonialsIdx = sections.findIndex((s) => s.key === "testimonials");
+  if (featuredIdx >= 0 && testimonialsIdx >= 0) {
+    const featuredOrder = sections[featuredIdx].order;
+    sections[testimonialsIdx] = { ...sections[testimonialsIdx], enabled: true, order: featuredOrder + 0.5 };
+  }
 
   // Sort by order, filter enabled, render
-  const sortedSections = [...sections]
+  const sortedSections = sections
     .filter((s) => s.enabled)
     .sort((a, b) => a.order - b.order);
 
