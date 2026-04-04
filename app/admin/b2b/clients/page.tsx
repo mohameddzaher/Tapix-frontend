@@ -13,9 +13,11 @@ import {
   HiOutlineMail,
   HiOutlineArrowLeft,
   HiOutlineOfficeBuilding,
+  HiOutlineDownload,
 } from 'react-icons/hi';
 import { Button, Input, Textarea, Card, Modal, ConfirmModal } from '@/components/ui';
 import { b2bApi } from '@/lib/api';
+import { exportToCSV, b2bClientColumns } from '@/lib/export';
 import toast from 'react-hot-toast';
 
 interface ClientFormData {
@@ -332,9 +334,19 @@ export default function B2BClientsPage() {
           <h1 className="text-2xl font-semibold text-dark-900">B2B Clients</h1>
           <p className="text-dark-500 mt-1">Manage business-to-business client accounts</p>
         </div>
-        <Button leftIcon={<HiOutlinePlus size={18} />} onClick={openAddModal}>
-          Add Client
-        </Button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => exportToCSV(clients, b2bClientColumns, 'b2b-clients')}
+            className="flex items-center gap-2 px-4 py-2 bg-dark-800 text-white rounded-lg hover:bg-dark-700 transition-colors text-sm"
+          >
+            <HiOutlineDownload size={16} />
+            Export
+          </button>
+          <Button leftIcon={<HiOutlinePlus size={18} />} onClick={openAddModal}>
+            Add Client
+          </Button>
+        </div>
       </div>
 
       <Card padding="md">

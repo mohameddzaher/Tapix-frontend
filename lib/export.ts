@@ -306,3 +306,80 @@ export const contactColumns: ExportColumn[] = [
   { key: 'respondedAt', header: 'Responded Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
   { key: 'createdAt', header: 'Received Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
 ];
+
+// ========== B2B Export Columns ==========
+
+export const b2bProductColumns: ExportColumn[] = [
+  { key: 'name', header: 'Product Name' },
+  { key: 'sku', header: 'SKU' },
+  { key: 'category', header: 'Category' },
+  { key: 'quantity', header: 'Quantity' },
+  { key: 'costPerUnit', header: 'Cost/Unit (SAR)' },
+  { key: 'totalCost', header: 'Total Cost (SAR)' },
+  { key: 'onlinePrice', header: 'Online Price (SAR)' },
+  { key: 'offlinePrice', header: 'Offline Price (SAR)' },
+  { key: 'supplierId', header: 'Supplier', transform: (val) => typeof val === 'object' ? val?.name || '' : '' },
+  { key: 'specs', header: 'Specifications' },
+  { key: 'isActive', header: 'Status', transform: (val) => val ? 'Active' : 'Inactive' },
+  { key: 'createdAt', header: 'Created Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
+];
+
+export const b2bSupplierColumns: ExportColumn[] = [
+  { key: 'name', header: 'Supplier Name' },
+  { key: 'contactPerson', header: 'Contact Person' },
+  { key: 'phone', header: 'Phone' },
+  { key: 'email', header: 'Email' },
+  { key: 'address', header: 'Address' },
+  { key: 'city', header: 'City' },
+  { key: 'country', header: 'Country' },
+  { key: 'totalPurchases', header: 'Total Purchases' },
+  { key: 'totalAmountPaid', header: 'Total Amount Paid (SAR)' },
+  { key: 'notes', header: 'Notes' },
+  { key: 'isActive', header: 'Status', transform: (val) => val ? 'Active' : 'Inactive' },
+  { key: 'createdAt', header: 'Created Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
+];
+
+export const b2bClientColumns: ExportColumn[] = [
+  { key: 'name', header: 'Client Name' },
+  { key: 'companyName', header: 'Company' },
+  { key: 'contactPerson', header: 'Contact Person' },
+  { key: 'phone', header: 'Phone' },
+  { key: 'email', header: 'Email' },
+  { key: 'address', header: 'Address' },
+  { key: 'city', header: 'City' },
+  { key: 'country', header: 'Country' },
+  { key: 'taxNumber', header: 'Tax Number' },
+  { key: 'totalOrders', header: 'Total Orders' },
+  { key: 'totalSpent', header: 'Total Spent (SAR)' },
+  { key: 'notes', header: 'Notes' },
+  { key: 'isActive', header: 'Status', transform: (val) => val ? 'Active' : 'Inactive' },
+  { key: 'createdAt', header: 'Created Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
+];
+
+export const b2bSaleColumns: ExportColumn[] = [
+  { key: 'invoiceNumber', header: 'Invoice #' },
+  { key: 'clientId', header: 'Client', transform: (val) => typeof val === 'object' ? val?.name || '' : '' },
+  { key: 'clientId', header: 'Company', transform: (val) => typeof val === 'object' ? val?.companyName || '' : '' },
+  { key: 'items', header: 'Items', transform: (val) => val?.map((i: any) => `${i.productName} x${i.quantity}`).join('; ') || '' },
+  { key: 'subtotal', header: 'Subtotal (SAR)' },
+  { key: 'discount', header: 'Discount (SAR)' },
+  { key: 'tax', header: 'Tax (SAR)' },
+  { key: 'total', header: 'Total (SAR)' },
+  { key: 'totalCost', header: 'Total Cost (SAR)' },
+  { key: 'profit', header: 'Profit (SAR)' },
+  { key: 'paymentStatus', header: 'Payment Status' },
+  { key: 'paymentMethod', header: 'Payment Method' },
+  { key: 'amountPaid', header: 'Amount Paid (SAR)' },
+  { key: 'notes', header: 'Notes' },
+  { key: 'saleDate', header: 'Sale Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
+];
+
+export const b2bExpenseColumns: ExportColumn[] = [
+  { key: 'title', header: 'Title' },
+  { key: 'amount', header: 'Amount (SAR)' },
+  { key: 'category', header: 'Category' },
+  { key: 'description', header: 'Description' },
+  { key: 'isRecurring', header: 'Recurring', transform: (val) => val ? 'Yes' : 'No' },
+  { key: 'recurringFrequency', header: 'Frequency' },
+  { key: 'date', header: 'Date', transform: (val) => val ? new Date(val).toLocaleString() : '' },
+];

@@ -20,6 +20,7 @@ import {
 } from 'react-icons/hi';
 import { Card, Button, Spinner, Skeleton } from '@/components/ui';
 import { b2bApi } from '@/lib/api';
+import { exportToCSV, b2bSaleColumns } from '@/lib/export';
 import toast from 'react-hot-toast';
 
 // ---------------------------------------------------------------------------
@@ -296,9 +297,19 @@ export default function B2BSalesPage() {
             Create and manage B2B invoices and sales
           </p>
         </div>
-        <Button leftIcon={<HiOutlinePlus size={18} />} onClick={openCreate}>
-          New Sale
-        </Button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => exportToCSV(sales, b2bSaleColumns, 'b2b-sales')}
+            className="flex items-center gap-2 px-4 py-2 bg-dark-800 text-white rounded-lg hover:bg-dark-700 transition-colors text-sm"
+          >
+            <HiOutlineDownload size={16} />
+            Export
+          </button>
+          <Button leftIcon={<HiOutlinePlus size={18} />} onClick={openCreate}>
+            New Sale
+          </Button>
+        </div>
       </div>
 
       {/* Search + Filters */}
@@ -1300,22 +1311,94 @@ function SaleSuccessView({
     }
   };
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = async () => {
     const phone = whatsappPhone.replace(/[^\d+]/g, '');
     if (!phone) {
       toast.error('Please enter a phone number');
       return;
     }
 
+    const clientName = client?.name || (sale.client as any)?.name || '';
+    const items = sale.items?.map((i) => `• ${i.productName || i.name || '-'} x${i.quantity} = ${formatSAR(i.totalPrice || i.total || i.quantity * i.pricePerUnit)}`).join('\n') || '';
+
     const message = [
-      `Invoice: ${sale.invoiceNumber}`,
-      `Date: ${formatDate(sale.saleDate || sale.createdAt)}`,
-      `Total: ${formatSAR(sale.total)}`,
-      `Status: ${sale.paymentStatus}`,
+      `📄 *INVOICE ${sale.invoiceNumber}*`,
+      `📅 Date: ${formatDate(sale.saleDate || sale.createdAt)}`,
       '',
-      'Thank you for your business!',
+      `👤 Client: *${clientName}*`,
+      '',
+      `📦 *Items:*`,
+      items,
+      '',
+      `💰 Subtotal: ${formatSAR(sale.subtotal)}`,
+      ...(sale.discount > 0 ? [`🏷️ Discount: -${formatSAR(sale.discount)}`] : []),
+      `📊 VAT (${sale.taxRate || 15}%): ${formatSAR(sale.tax)}`,
+      `━━━━━━━━━━━━━`,
+      `💵 *Total: ${formatSAR(sale.total)}*`,
+      '',
+      `✅ Payment: ${sale.paymentStatus === 'paid' ? 'Paid' : sale.paymentStatus === 'partial' ? 'Partially Paid' : 'Unpaid'}`,
+      ...(sale.paymentMethod ? [`💳 Method: ${sale.paymentMethod}`] : []),
+      '',
+      `Thank you for your business! 🙏`,
+      `— *Tapix*`,
     ].join('\n');
 
+    // Try Web Share API first (works on mobile with files)
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        // Generate image blob for sharing
+        const el = invoiceRef.current;
+        if (el) {
+          const clone = el.cloneNode(true) as HTMLElement;
+          clone.querySelectorAll('img').forEach(img => {
+            const text = document.createElement('div');
+            text.textContent = img.alt || 'Tapix';
+            text.style.cssText = 'font-size:24px;font-weight:bold;';
+            img.replaceWith(text);
+          });
+
+          const canvas = document.createElement('canvas');
+          const scale = 2;
+          canvas.width = el.offsetWidth * scale;
+          canvas.height = el.offsetHeight * scale;
+          const ctx = canvas.getContext('2d')!;
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${el.offsetWidth * scale}" height="${el.offsetHeight * scale}"><foreignObject width="${el.offsetWidth}" height="${el.offsetHeight}" style="transform:scale(${scale});transform-origin:top left;">${new XMLSerializer().serializeToString(clone)}</foreignObject></svg>`;
+          const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+
+          await new Promise<void>((resolve, reject) => {
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0);
+              URL.revokeObjectURL(url);
+              resolve();
+            };
+            img.onerror = () => { URL.revokeObjectURL(url); reject(); };
+            img.src = url;
+          });
+
+          const imageBlob = await new Promise<Blob>((resolve) =>
+            canvas.toBlob((b) => resolve(b!), 'image/png')
+          );
+
+          const file = new File([imageBlob], `invoice-${sale.invoiceNumber}.png`, { type: 'image/png' });
+
+          await navigator.share({
+            title: `Invoice ${sale.invoiceNumber}`,
+            text: message,
+            files: [file],
+          });
+          return;
+        }
+      } catch {
+        // Fall through to wa.me
+      }
+    }
+
+    // Fallback: open WhatsApp with text
     window.open(
       `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
       '_blank'
@@ -1469,13 +1552,29 @@ function SaleDetailView({ sale, isLoading, clients, onBack }: SaleDetailViewProp
     const phone = whatsappPhone.replace(/[^\d+]/g, '');
     if (!phone || !sale) return;
 
+    const clientName = (client as Client)?.name || '';
+    const items = sale.items?.map((i: any) => `• ${i.productName || i.name || '-'} x${i.quantity} = ${formatSAR(i.totalPrice || i.total || i.quantity * i.pricePerUnit)}`).join('\n') || '';
+
     const message = [
-      `Invoice: ${sale.invoiceNumber}`,
-      `Date: ${formatDate(sale.saleDate || sale.createdAt)}`,
-      `Total: ${formatSAR(sale.total)}`,
-      `Status: ${sale.paymentStatus}`,
+      `📄 *INVOICE ${sale.invoiceNumber}*`,
+      `📅 Date: ${formatDate(sale.saleDate || sale.createdAt)}`,
       '',
-      'Thank you for your business!',
+      `👤 Client: *${clientName}*`,
+      '',
+      `📦 *Items:*`,
+      items,
+      '',
+      `💰 Subtotal: ${formatSAR(sale.subtotal)}`,
+      ...(sale.discount > 0 ? [`🏷️ Discount: -${formatSAR(sale.discount)}`] : []),
+      `📊 VAT (${sale.taxRate || 15}%): ${formatSAR(sale.tax)}`,
+      `━━━━━━━━━━━━━`,
+      `💵 *Total: ${formatSAR(sale.total)}*`,
+      '',
+      `✅ Payment: ${sale.paymentStatus === 'paid' ? 'Paid' : sale.paymentStatus === 'partial' ? 'Partially Paid' : 'Unpaid'}`,
+      ...(sale.paymentMethod ? [`💳 Method: ${sale.paymentMethod}`] : []),
+      '',
+      `Thank you for your business! 🙏`,
+      `— *Tapix*`,
     ].join('\n');
 
     window.open(

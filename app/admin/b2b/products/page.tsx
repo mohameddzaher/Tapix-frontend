@@ -9,9 +9,11 @@ import {
   HiOutlinePencil,
   HiOutlineTrash,
   HiOutlineX,
+  HiOutlineDownload,
 } from 'react-icons/hi';
 import { Card, Button, Skeleton } from '@/components/ui';
 import { b2bApi } from '@/lib/api';
+import { exportToCSV, b2bProductColumns } from '@/lib/export';
 import { formatCurrency, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -175,9 +177,19 @@ export default function B2BProductsPage() {
           <h1 className="text-2xl font-semibold text-dark-900">B2B Products</h1>
           <p className="text-dark-500 mt-1">Manage your wholesale product catalog</p>
         </div>
-        <Button onClick={openAdd} leftIcon={<HiOutlinePlus size={18} />}>
-          Add Product
-        </Button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => exportToCSV(products, b2bProductColumns, 'b2b-products')}
+            className="flex items-center gap-2 px-4 py-2 bg-dark-800 text-white rounded-lg hover:bg-dark-700 transition-colors text-sm"
+          >
+            <HiOutlineDownload size={16} />
+            Export
+          </button>
+          <Button onClick={openAdd} leftIcon={<HiOutlinePlus size={18} />}>
+            Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
