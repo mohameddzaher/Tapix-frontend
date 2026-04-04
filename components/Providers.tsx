@@ -26,13 +26,28 @@ function AuthProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       setLoading(true);
       try {
-        // Try to refresh the token and get user data
+        // First try: restore access token from localStorage (helps on mobile)
+        const storedToken = typeof window !== 'undefined' ? localStorage.getItem('tapix_at') : null;
+        if (storedToken) {
+          setAccessToken(storedToken);
+          try {
+            const user = await authApi.getMe();
+            setUser(user);
+            setLoading(false);
+            return; // Success with stored token
+          } catch {
+            // Stored token expired, try refresh
+          }
+        }
+
+        // Second try: refresh via cookie
         const { accessToken } = await authApi.refresh();
         setAccessToken(accessToken);
         const user = await authApi.getMe();
         setUser(user);
       } catch (error) {
         // Not authenticated, that's fine
+        setAccessToken(null);
         setUser(null);
       } finally {
         setLoading(false);

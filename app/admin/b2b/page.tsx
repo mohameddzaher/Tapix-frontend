@@ -70,7 +70,7 @@ function ChangeIndicator({ value }: { value: number }) {
   return (
     <span
       className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
-        isPositive ? 'text-emerald-400 bg-emerald-500/15' : 'text-red-400 bg-red-500/15'
+        isPositive ? 'text-emerald-400 bg-emerald-500/25' : 'text-red-400 bg-red-500/25'
       }`}
     >
       {isPositive ? <HiOutlineTrendingUp size={14} /> : <HiOutlineTrendingDown size={14} />}
@@ -81,11 +81,11 @@ function ChangeIndicator({ value }: { value: number }) {
 
 function PaymentStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    paid: 'text-emerald-400 bg-emerald-500/15',
-    partial: 'text-amber-400 bg-amber-500/15',
-    unpaid: 'text-red-400 bg-red-500/15',
-    overdue: 'text-red-400 bg-red-500/15',
-    pending: 'text-amber-400 bg-amber-500/15',
+    paid: 'text-emerald-400 bg-emerald-500/25',
+    partial: 'text-amber-400 bg-amber-500/25',
+    unpaid: 'text-red-400 bg-red-500/25',
+    overdue: 'text-red-400 bg-red-500/25',
+    pending: 'text-amber-400 bg-amber-500/25',
   };
   return (
     <span
@@ -132,7 +132,7 @@ export default function B2BDashboardPage() {
       value: formatSAR(stats?.totalRevenue || 0),
       change: stats?.revenueChange,
       icon: HiOutlineCurrencyDollar,
-      iconBg: 'bg-primary-600/15',
+      iconBg: 'bg-primary-600/25',
       iconColor: 'text-primary-400',
     },
     {
@@ -140,14 +140,14 @@ export default function B2BDashboardPage() {
       value: formatSAR(stats?.totalProfit || 0),
       change: stats?.profitChange,
       icon: HiOutlineTrendingUp,
-      iconBg: 'bg-emerald-500/15',
+      iconBg: 'bg-emerald-500/25',
       iconColor: 'text-emerald-400',
     },
     {
       label: 'Net Profit',
       value: formatSAR(stats?.netProfit || 0),
       icon: HiOutlineCash,
-      iconBg: (stats?.netProfit || 0) >= 0 ? 'bg-emerald-500/15' : 'bg-red-500/15',
+      iconBg: (stats?.netProfit || 0) >= 0 ? 'bg-emerald-500/25' : 'bg-red-500/25',
       iconColor: (stats?.netProfit || 0) >= 0 ? 'text-emerald-400' : 'text-red-400',
     },
     {
@@ -155,35 +155,35 @@ export default function B2BDashboardPage() {
       value: formatSAR(stats?.totalExpenses || 0),
       change: stats?.expenseChange,
       icon: HiOutlineClipboardList,
-      iconBg: 'bg-red-500/15',
+      iconBg: 'bg-red-500/25',
       iconColor: 'text-red-400',
     },
     {
       label: 'Total Sales',
       value: formatNumber(stats?.totalSales || 0),
       icon: HiOutlineShoppingCart,
-      iconBg: 'bg-primary-600/15',
+      iconBg: 'bg-primary-600/25',
       iconColor: 'text-primary-400',
     },
     {
       label: 'Total Products',
       value: formatNumber(stats?.totalProducts || 0),
       icon: HiOutlineCube,
-      iconBg: 'bg-violet-500/15',
+      iconBg: 'bg-violet-500/25',
       iconColor: 'text-violet-400',
     },
     {
       label: 'Total Clients',
       value: formatNumber(stats?.totalClients || 0),
       icon: HiOutlineUsers,
-      iconBg: 'bg-cyan-500/15',
+      iconBg: 'bg-cyan-500/25',
       iconColor: 'text-cyan-400',
     },
     {
       label: 'Total Suppliers',
       value: formatNumber(stats?.totalSuppliers || 0),
       icon: HiOutlineTruck,
-      iconBg: 'bg-amber-500/15',
+      iconBg: 'bg-amber-500/25',
       iconColor: 'text-amber-400',
     },
     {
@@ -191,7 +191,7 @@ export default function B2BDashboardPage() {
       value: formatSAR(stats?.inventoryValue || 0),
       subtitle: `${formatNumber(stats?.inventoryItems || 0)} items`,
       icon: HiOutlineChartBar,
-      iconBg: 'bg-indigo-500/15',
+      iconBg: 'bg-indigo-500/25',
       iconColor: 'text-indigo-400',
     },
   ];
@@ -612,7 +612,7 @@ export default function B2BDashboardPage() {
           className="bg-dark-800 rounded-xl border border-red-500/30"
         >
           <div className="px-6 py-4 border-b border-dark-700/50 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-red-500/15">
+            <div className="p-2 rounded-lg bg-red-500/25">
               <HiOutlineExclamation size={20} className="text-red-400" />
             </div>
             <div>

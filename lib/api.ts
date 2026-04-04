@@ -3,14 +3,38 @@ import { ApiResponse } from '@tapix/shared';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api/v1';
 
-// Token management
+// Token management - memory + localStorage for mobile persistence
 let accessToken: string | null = null;
+
+const TOKEN_KEY = 'tapix_at';
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
+  try {
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+      } else {
+        localStorage.removeItem(TOKEN_KEY);
+      }
+    }
+  } catch {}
 };
 
-export const getAccessToken = () => accessToken;
+export const getAccessToken = () => {
+  if (accessToken) return accessToken;
+  // Restore from localStorage (helps on mobile refresh)
+  try {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(TOKEN_KEY);
+      if (stored) {
+        accessToken = stored;
+        return stored;
+      }
+    }
+  } catch {}
+  return null;
+};
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
@@ -24,8 +48,9 @@ const api: AxiosInstance = axios.create({
 // Request interceptor - add access token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
