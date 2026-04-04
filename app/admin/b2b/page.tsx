@@ -90,7 +90,7 @@ function PaymentStatusBadge({ status }: { status: string }) {
   return (
     <span
       className={`inline-block px-2.5 py-1 text-xs font-medium rounded-full capitalize ${
-        styles[status?.toLowerCase()] || 'text-dark-300 bg-dark-800'
+        styles[status?.toLowerCase()] || 'text-dark-300 bg-dark-950'
       }`}
     >
       {status}
@@ -217,7 +217,7 @@ export default function B2BDashboardPage() {
           <select
             value={period}
             onChange={(e) => setPeriod(Number(e.target.value))}
-            className="px-4 py-2 bg-dark-800 border border-dark-700 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+            className="px-4 py-2 bg-dark-950 border border-dark-700 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           >
             {PERIOD_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -236,7 +236,7 @@ export default function B2BDashboardPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
-            className="bg-dark-800 rounded-xl p-5 border border-dark-700/50 hover:border-dark-600 transition-colors"
+            className="bg-dark-950 rounded-xl p-5 border border-dark-700/50 hover:border-dark-600 transition-colors"
           >
             <div className="flex items-start justify-between">
               <div className={`p-2.5 rounded-lg ${card.iconBg}`}>
@@ -260,7 +260,7 @@ export default function B2BDashboardPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-dark-800 rounded-xl border border-dark-700/50"
+        className="bg-dark-950 rounded-xl border border-dark-700/50"
       >
         <div className="px-6 py-4 border-b border-dark-700/50">
           <h3 className="text-lg font-semibold text-white">Sales by Month</h3>
@@ -348,7 +348,7 @@ export default function B2BDashboardPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="bg-dark-800 rounded-xl border border-dark-700/50"
+          className="bg-dark-950 rounded-xl border border-dark-700/50"
         >
           <div className="px-6 py-4 border-b border-dark-700/50">
             <h3 className="text-lg font-semibold text-white">Top Selling Products</h3>
@@ -407,7 +407,7 @@ export default function B2BDashboardPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-dark-800 rounded-xl border border-dark-700/50"
+          className="bg-dark-950 rounded-xl border border-dark-700/50"
         >
           <div className="px-6 py-4 border-b border-dark-700/50">
             <h3 className="text-lg font-semibold text-white">Top Clients</h3>
@@ -465,7 +465,7 @@ export default function B2BDashboardPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45 }}
-        className="bg-dark-800 rounded-xl border border-dark-700/50"
+        className="bg-dark-950 rounded-xl border border-dark-700/50"
       >
         <div className="px-6 py-4 border-b border-dark-700/50">
           <h3 className="text-lg font-semibold text-white">Expenses by Category</h3>
@@ -521,7 +521,7 @@ export default function B2BDashboardPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="bg-dark-800 rounded-xl border border-dark-700/50"
+        className="bg-dark-950 rounded-xl border border-dark-700/50"
       >
         <div className="px-6 py-4 border-b border-dark-700/50 flex items-center justify-between">
           <div>
@@ -609,7 +609,7 @@ export default function B2BDashboardPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55 }}
-          className="bg-dark-800 rounded-xl border border-red-500/30"
+          className="bg-dark-950 rounded-xl border border-red-500/30"
         >
           <div className="px-6 py-4 border-b border-dark-700/50 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-red-500/25">

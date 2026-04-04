@@ -61,14 +61,14 @@ export function Newsletter() {
   };
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-dark-950 relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -left-20 w-60 h-60 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary-400/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-white/20 rounded-full" />
-        <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-white/15 rounded-full" />
-        <div className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-white/25 rounded-full" />
+        <div className="absolute -top-20 -left-20 w-60 h-60 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary-600/[0.06] rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-primary-400/20 rounded-full" />
+        <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-primary-400/15 rounded-full" />
+        <div className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-primary-400/25 rounded-full" />
       </div>
 
       <div className="container-custom relative">
