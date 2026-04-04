@@ -129,6 +129,103 @@ function PaymentStatusBadge({ status }: { status: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Searchable Product Select
+// ---------------------------------------------------------------------------
+
+function ProductSearchSelect({ products, value, onChange }: {
+  products: Product[];
+  value: string;
+  onChange: (productId: string) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const selected = products.find(p => p._id === value);
+
+  const filtered = search
+    ? products.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        (p.sku || '').toLowerCase().includes(search.toLowerCase())
+      )
+    : products;
+
+  // Close on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full border border-beige-300 rounded-lg px-3 py-2 text-sm bg-white cursor-pointer flex items-center justify-between min-h-[38px]"
+      >
+        <span className={selected ? 'text-dark-900' : 'text-dark-400'}>
+          {selected ? `${selected.sku || ''} ${selected.name}`.trim() : 'Select product...'}
+        </span>
+        <HiOutlineChevronDown size={14} className="text-dark-400 flex-shrink-0" />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-beige-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
+          {/* Search input */}
+          <div className="p-2 border-b border-beige-200">
+            <div className="relative">
+              <HiOutlineSearch size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-dark-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search by name or code..."
+                className="w-full pl-8 pr-3 py-1.5 border border-beige-200 rounded text-sm focus:ring-1 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Options */}
+          <div className="overflow-y-auto max-h-48">
+            {filtered.length === 0 ? (
+              <div className="p-3 text-sm text-dark-400 text-center">No products found</div>
+            ) : (
+              filtered.map(p => (
+                <button
+                  key={p._id}
+                  type="button"
+                  onClick={() => {
+                    onChange(p._id);
+                    setIsOpen(false);
+                    setSearch('');
+                  }}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-beige-50 transition-colors flex items-center justify-between ${
+                    p._id === value ? 'bg-primary-50 text-primary-700' : 'text-dark-900'
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <span className="font-mono text-xs text-dark-400 mr-2">{p.sku || '-'}</span>
+                    <span className="truncate">{p.name}</span>
+                  </div>
+                  <span className="text-xs text-dark-400 flex-shrink-0 ml-2">
+                    {p.quantity} in stock
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Page
 // ---------------------------------------------------------------------------
 
@@ -952,26 +1049,16 @@ function CreateSaleForm({ clients, onSuccess, onBack }: CreateSaleFormProps) {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                  {/* Product Select */}
+                  {/* Product Select with Search */}
                   <div className="sm:col-span-4">
                     <label className="block text-xs font-medium text-dark-500 mb-1">
                       Product
                     </label>
-                    <select
+                    <ProductSearchSelect
+                      products={products}
                       value={item.productId}
-                      onChange={(e) =>
-                        handleProductSelect(index, e.target.value)
-                      }
-                      className={selectCls}
-                    >
-                      <option value="">Select product...</option>
-                      {products.map((p) => (
-                        <option key={p._id} value={p._id}>
-                          {p.name}
-                          {p.sku ? ` (${p.sku})` : ''}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(productId) => handleProductSelect(index, productId)}
+                    />
                   </div>
 
                   {/* Available Qty Info */}
