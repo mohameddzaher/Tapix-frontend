@@ -40,9 +40,9 @@ const defaultSections = [
   { key: "categoryStrip", enabled: true, order: 3 },
   { key: "middleBanner", enabled: true, order: 4 },
   { key: "featured", enabled: true, order: 5 },
-  { key: "brands", enabled: true, order: 6 },
-  { key: "whyChooseUs", enabled: true, order: 7 },
-  { key: "testimonials", enabled: true, order: 8 },
+  { key: "testimonials", enabled: true, order: 6 },
+  { key: "brands", enabled: true, order: 7 },
+  { key: "whyChooseUs", enabled: true, order: 8 },
   { key: "bottomBanner", enabled: true, order: 9 },
   { key: "newsletter", enabled: true, order: 10 },
 ];

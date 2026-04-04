@@ -170,9 +170,6 @@ export function Testimonials() {
 
   const hasTestimonials = testimonials && testimonials.length > 0;
 
-  // Hide section if no testimonials and done loading
-  if (!isLoading && !hasTestimonials) return null;
-
   return (
     <section className="py-10 md:py-14 bg-dark-950 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
