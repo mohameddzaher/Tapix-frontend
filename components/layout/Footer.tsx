@@ -88,8 +88,14 @@ export function Footer() {
   ].filter(Boolean) as { name: string; href: string; icon: any }[];
 
   return (
-    <footer className="bg-dark-950 text-white">
+    <footer>
+      {/* Separator */}
+      <div className="bg-white py-4 text-center">
+        <p className="text-xs text-dark-400 tracking-widest uppercase">Trusted by thousands across Saudi Arabia</p>
+      </div>
+
       {/* Main Footer */}
+      <div className="bg-dark-950 text-white">
       <div className="container-custom py-10 md:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 md:gap-8">
           {/* Brand Column - wider */}
@@ -287,6 +293,7 @@ export function Footer() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </footer>
   );
